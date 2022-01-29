@@ -51,4 +51,6 @@ bundle exec pod install
 
 ## Submission Notes
 
-[Add your notes here.]
+To start the project, please use 'npm run ios/android' and not 'npx' as I have edited the react scripts, and within there 'npx' is ran to start the app itself.
+Search logic can be found in 'server.js' which is the file used for running a local JSON server. This was done to properly implement RTK Query, and also why the react scripts had to be edited.
+
