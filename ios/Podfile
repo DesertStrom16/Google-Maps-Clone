@@ -1,0 +1,44 @@
+require_relative '../node_modules/react-native/scripts/react_native_pods'
+require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
+
+platform :ios, '10.0'
+
+target 'Challenge' do
+  config = use_native_modules!
+
+  use_react_native!(
+    :path => config[:reactNativePath],
+    :hermes_enabled => false
+  )
+
+  pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
+
+  target 'ChallengeTests' do
+    inherit! :complete
+  end
+
+  $ReactNativeMapboxGLIOSVersion = '6.2.1'
+
+  pre_install do |installer|
+    $RNMBGL.pre_install(installer)
+  end
+  use_flipper!({ 'Flipper-Folly' => '2.5.3', 'Flipper' => '0.87.0', 'Flipper-RSocket' => '1.3.1' })
+  post_install do |installer|
+    react_native_post_install(installer)
+
+    $RNMBGL.post_install(installer)
+
+    installer.pods_project.targets.each do |target|
+      target.build_configurations.each do |config|
+        config.build_settings.delete 'IPHONEOS_DEPLOYMENT_TARGET'
+      end
+     end
+
+    # Fixes issue where on ARM-based Macs, Xcode builds targeted for the Simulator
+    # fail because the arm64 architecture is unsupported. 'Debug' corresponds to
+    # the configuration set in Xcode > TruckMap project > Info tab > Configurations.
+    installer.pods_project.build_configurations.each do |config|
+      config.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = "arm64"
+    end
+  end
+end
